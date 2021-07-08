@@ -10,7 +10,8 @@ CBOP
 C !ROUTINE: PRESCRIBE_VEC
 
 C !INTERFACE:
-      SUBROUTINE PRESCRIBE_VEC_PRESCRIBE_FIELD( fld_name, myThid )
+      SUBROUTINE PRESCRIBE_VEC_PRESCRIBE_FIELD( fld_name, 
+     &                                          myTime, myIter, myThid)
 
 C     !DESCRIPTION:
 C     Initialize PRESCRIBE_VEC variables
@@ -28,6 +29,8 @@ C     !USES:
 C     !INPUT/OUTPUT PARAMETERS:
 C     myThid ::  my Thread Id number
       CHARACTER*(*) fld_name
+      _RL     myTime
+      INTEGER myIter
       INTEGER myThid
       
 
@@ -52,7 +55,7 @@ CBOC
       WRITE(msgBuf,'(A)') "==========================================="
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                     SQUEEZE_RIGHT, myThid )
-      WRITE(msgBuf,'(A)') "  BEGIN PRESCRIBE_VEC DEBUG "
+      WRITE(msgBuf,'(A,I5)') "  BEGIN PRESCRIBE_VEC DEBUG ",myIter
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                     SQUEEZE_RIGHT, myThid )
       WRITE(msgBuf,'(A)') "==========================================="
@@ -140,18 +143,42 @@ C           Fill in the halo region if the point is on the boundary
                   DO i_add=1,OLx
                         theta(i,j-j_add,k,bi,bj) = val
                   ENDDO
-            ENDIF         
+            ENDIF
 
-              if ((debug .eq. 1).and.(k.eq.1).and.(vec_id.eq.1)) then
-                  WRITE(msgBuf,'(A,A,A,F10.3)') 
-     &               "     Setting ",fld_name," = ",val
-                  CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                                   SQUEEZE_RIGHT, myThid )
-                  WRITE(msgBuf,'(A,I5,A,I5,A,I5,A,I5)') 
-     &               "        at i =",i," j=",j," bi =",bi," bj = ",bj
-                  CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                                   SQUEEZE_RIGHT, myThid )
-              endif
+C           Fill in the corners of the halo by dragging laterally  
+C            DO j=1,Oly         
+C                 Lower left 
+C                  DO i_add=1,OLx
+C                        theta(1-i_add,1-j_add,k,bi,bj) = 
+C     &                   theta(1-i_add+1,1-j_add,k,bi,bj)
+C                  ENDDO
+C                 Upper left 
+C                  DO i_add=1,OLx
+C                        theta(1-i_add,sNy+j_add,k,bi,bj) = 
+C     &                   theta(1-i_add+1,sNy+j_add,k,bi,bj)
+C                  ENDDO
+C                 Lower right 
+C                  DO i_add=1,OLx
+C                        theta(sNx+i_add,1-j_add,k,bi,bj) = 
+C     &                   theta(sNx+i_add-1,1-j_add,k,bi,bj)
+C                  ENDDO
+C                 Upper right
+C                  DO i_add=1,OLx
+C                        theta(sNx+i_add,sNy+j_add,k,bi,bj) = 
+C     &                   theta(sNx+i_add-1,sNy+j_add,k,bi,bj)
+C                  ENDDO
+C            ENDDO
+
+C              if ((debug .eq. 1).and.(k.eq.1).and.(vec_id.eq.1)) then
+C                  WRITE(msgBuf,'(A,A,A,F10.3)') 
+C     &               "     Setting ",fld_name," = ",val
+C                  CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                                   SQUEEZE_RIGHT, myThid )
+C                  WRITE(msgBuf,'(A,I5,A,I5,A,I5,A,I5)') 
+C     &               "        at i =",i," j=",j," bi =",bi," bj = ",bj
+C                  CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                                   SQUEEZE_RIGHT, myThid )
+C              endif
 
               ENDDO
 
@@ -671,10 +698,31 @@ C-- ETAN
                 bi = vec_point_ij(vec_id,3,n_point)
                 bj = vec_point_ij(vec_id,4,n_point)
                 val = vec_subFields(vec_id,mask_fld_index,n_point,1)
-                ! print *, 'i=',i,'j=',j,'val=',val
-                DO k=1,vec_levels(fld, vec_id)
-                      etaN(i,j,bi,bj) = val
-                ENDDO
+
+                etaN(i,j,bi,bj) = val
+
+C           Fill in the halo region if the point is on the boundary
+C                  IF (i.eq.sNx) THEN
+C                        DO i_add=1,OLx
+C                              etaN(i+i_add,j,bi,bj) = val
+C                        ENDDO
+C                  ENDIF
+C                  IF (i.eq.1) THEN
+C                        DO i_add=1,OLx
+C                              etaN(i-i_add,j,bi,bj) = val
+C                        ENDDO
+C                  ENDIF
+C                  IF (j.eq.sNy) THEN
+C                        DO j_add=1,OLy
+C                              etaN(i,j+j_add,bi,bj) = val
+C                        ENDDO
+C                  ENDIF 
+C                  IF (j.eq.1) THEN
+C                        DO i_add=1,OLx
+C                              etaN(i,j-j_add,bi,bj) = val
+C                        ENDDO
+C                  ENDIF     
+
           ENDDO
 
       ENDIF
