@@ -131,9 +131,9 @@ C-- THETA
 !      &                                   SQUEEZE_RIGHT, myThid )
 !               endif  
 
-!               DO k=1,nK
-!                   val = vec_subFields(vec_id,mask_fld_index,n_point,k)
-!                   theta(i,j,k,bi,bj) = val
+               DO k=1,nK
+                   val = vec_subFields(vec_id,mask_fld_index,n_point,k)
+                   theta(i,j,k,bi,bj) = val
 !                   if ((debug .eq. 1).and.(k.eq.nK)) then
 !                         WRITE(msgBuf,'(A,F10.3,A,I5)') 
 !      &               "  Prescribed theta = ",val,

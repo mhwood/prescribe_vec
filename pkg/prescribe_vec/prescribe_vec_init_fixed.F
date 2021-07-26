@@ -40,6 +40,7 @@ C     !LOCAL VARIABLES:
       INTEGER mask_name_len
       INTEGER prescribe_counter
       INTEGER relax_counter
+      CHARACTER*50 tmpstr
       CHARACTER*50 mask_filename
       CHARACTER*50 level_mask_filename
       CHARACTER*50 relax_time_filename
@@ -142,13 +143,14 @@ C     Looping through each vector mask
 
 C     Counting number of valid characters to trim trailing whitespaces
       mask_name_len = 0
-      DO i=1, len(vec_fname_prefixes(vec_id))
-        IF (vec_fname_prefixes(vec_id)(i:i) .ne. ' ') then
+      tmpstr = vec_fname_prefixes(vec_id)
+      DO i=1, len(tmpstr)
+        IF (tmpstr(i:i) .ne. ' ') then
             mask_name_len = mask_name_len + 1
         ENDIF
       ENDDO
       WRITE(mask_filename,'(A,A)') 
-     &     vec_fname_prefixes(vec_id)(1:mask_name_len),'.bin'
+     &     tmpstr(1:mask_name_len),'.bin'
 
 C       Read mask files and assign portion of mask to each process
         CALL READ_REC_XY_RL( mask_filename,
@@ -186,8 +188,9 @@ C     Looping through each vector mask
 
 C     Counting number of valid characters to trim trailing whitespaces
       mask_name_len = 0
-      DO i=1, len(vec_depth_cell_fnames(fld,vec_id))
-        IF (vec_depth_cell_fnames(fld,vec_id)(i:i) .ne. ' ') then
+      tmpstr = vec_depth_cell_fnames(fld,vec_id)
+      DO i=1, len(tmpstr)
+        IF (tmpstr(i:i) .ne. ' ') then
             mask_name_len = mask_name_len + 1
         ENDIF
       ENDDO
@@ -195,7 +198,7 @@ C     Counting number of valid characters to trim trailing whitespaces
       IF (mask_name_len.gt.0) THEN 
 
       WRITE(mask_filename,'(A)') 
-     &     vec_depth_cell_fnames(fld,vec_id)(1:mask_name_len)
+     &     tmpstr(1:mask_name_len)
 
       if (debug .eq. 1) then
         
