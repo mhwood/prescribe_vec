@@ -36,14 +36,16 @@ C     !LOCAL VARIABLES:
       INTEGER, PARAMETER :: debug = 1
       CHARACTER*(MAX_LEN_MBUF) msgBuf
       INTEGER i, j, bi, bj, p, k
-      INTEGER vec_id
+      INTEGER vec_id, fld
       INTEGER mask_name_len
       INTEGER prescribe_counter
       INTEGER relax_counter
       CHARACTER*50 mask_filename
+      CHARACTER*50 level_mask_filename
       CHARACTER*50 relax_time_filename
       CHARACTER*50 relax_mask_filename
       _RL mask_buffer(nVEC_masks,1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
+      _RL level_buff(nVEC_masks,1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
       _RL rt_buff(nVEC_masks,1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
       
       
@@ -90,6 +92,7 @@ C----&------------------------------------------------------------------xxxxxxx|
                   DO j=1-OLy,sNy+OLy
                   DO i=1-OLx,sNx+OLx
                         vec_subMask(vec_id,i,j,bi,bj) = 0.0
+                        depth_mask(vec_id,i,j,bi,bj) = 0.0
                         relax_time(vec_id,i,j,bi,bj) = 0.0
                         relax_mask(vec_id,i,j,bi,bj) = 0.0
                   ENDDO
@@ -108,6 +111,13 @@ C----&------------------------------------------------------------------xxxxxxx|
                   vec_point_ij(vec_id, 2,i) = 0
                   vec_point_ij(vec_id, 3,i) = 0
                   vec_point_ij(vec_id, 4,i) = 0
+            ENDDO
+
+            DO fld=1,N_VEC_FIELDS
+            DO i=1,sNx*sNy
+                  vec_depth_level(vec_id, fld, i) = 
+     &             vec_levels(fld,vec_id)
+            ENDDO
             ENDDO
 
       ENDDO
@@ -160,6 +170,76 @@ C       Filling in halo regions of sub masks
 
 C       Mask a list of where the mask points are located
         CALL IDENTIFY_VEC_POINTS(mask_buffer,vec_id, myThid)
+
+      ENDDO
+
+C----&------------------------------------------------------------------xxxxxxx|
+C     Read in the level masks
+C----&------------------------------------------------------------------xxxxxxx|
+
+C     Looping through each vector mask
+      DO vec_id=1, nVEC_masks
+
+      DO fld=1,N_VEC_FIELDS
+
+      mask_filename = vec_depth_cell_fnames(fld,vec_id) 
+
+C     Counting number of valid characters to trim trailing whitespaces
+      mask_name_len = 0
+      DO i=1, len(vec_depth_cell_fnames(fld,vec_id))
+        IF (vec_depth_cell_fnames(fld,vec_id)(i:i) .ne. ' ') then
+            mask_name_len = mask_name_len + 1
+        ENDIF
+      ENDDO
+
+      IF (mask_name_len.gt.0) THEN 
+
+      WRITE(mask_filename,'(A)') 
+     &     vec_depth_cell_fnames(fld,vec_id)(1:mask_name_len)
+
+      if (debug .eq. 1) then
+        
+        WRITE(msgBuf,'(A,A,A)')  'Identifying depth levels for ',
+     &  ' mask ', mask_filename
+        CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      endif
+
+C       Read mask files and assign portion of mask to each process
+        CALL READ_REC_XY_RL( mask_filename,
+     &               level_buff(vec_id,:,:,:,:), 1, 0, myThid )
+
+C       Filling in halo regions of sub masks
+        _EXCH_XY_RL(level_buff(vec_id,:,:,:,:), myThid)
+
+        DO bj = myByLo(myThid), myByHi(myThid)
+            DO bi = myBxLo(myThid), myBxHi(myThid)
+                  DO j=1-OLy,sNy+OLy
+                  DO i=1-OLx,sNx+OLx
+                        depth_mask(vec_id,i,j,bi,bj)
+     &                      = level_buff(vec_id,i,j,bi,bj)
+                  ENDDO
+                  ENDDO
+            ENDDO
+        ENDDO
+
+      DO p=1,sNx*sNy
+            i = vec_point_ij(vec_id, 1, p)
+            j = vec_point_ij(vec_id, 2, p)
+            bi = vec_point_ij(vec_id, 3, p)
+            bj = vec_point_ij(vec_id, 4, p)
+            IF (depth_mask(vec_id,i,j,bi,bj).gt.0) THEN
+            vec_depth_level(vec_id, fld, p) = 
+     &       depth_mask(vec_id,i,j,bi,bj)
+            ENDIF
+      ENDDO
+
+C       Organize the depth levels into a lists mimicking the vec_point_ij_list
+!         CALL IDENTIFY_VEC_POINTS(mask_buffer,vec_id, myThid)
+
+      ENDIF
+      
+      ENDDO
 
       ENDDO
 
@@ -254,6 +334,8 @@ C----&------------------------------------------------------------------xxxxxxx|
             ENDDO
       ENDDO
       ENDDO
+
+      PRINT *,"MAX SUBMASK VAL",MAXVAL(vec_subMask(vec_id,:,:,:,:))
 
       vec_nRelaxPoints(vec_id) = relax_counter 
       vec_nPrescribePoints(vec_id) = prescribe_counter

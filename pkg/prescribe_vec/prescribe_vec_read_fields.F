@@ -41,6 +41,7 @@ C      INTEGER i,j,k,l, bi,bj
       INTEGER mask_name_len
       CHARACTER*50 field_file_name
       INTEGER iRecord
+      LOGICAL continue_to_read
 
 CEOP
 C------------------------------------------------------------------------------|
@@ -61,6 +62,18 @@ CBOC
       endif
 
 C------------------------------------------------------------------------------|
+
+       IF (vec_field_is_constant) THEN 
+            IF (myIter.ge.nIter0) THEN 
+                  continue_to_read = .FALSE.
+            ELSE
+                  continue_to_read = .TRUE.
+            ENDIF
+      ELSE
+            continue_to_read = .TRUE.
+      ENDIF
+
+      IF (continue_to_read) THEN
 
 C     In this code, we 
 C        1 - loop through all of the masks and read in the the variables 
@@ -155,6 +168,9 @@ C     variable on one mask
       ENDDO
       endif
 
+C     endif (continue_to_read) 
+      ENDIF
+
 C------------------------------------------------------------------------------|
 
       if (debug .eq. 1) then
@@ -170,6 +186,8 @@ C------------------------------------------------------------------------------|
       endif
 
       RETURN
+
+
 
 #endif /* ALLOW_PRESCRIBE_VEC */
       

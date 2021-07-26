@@ -40,7 +40,7 @@ C      INTEGER i,j,k,l, bi,bj
       CHARACTER*(MAX_LEN_MBUF) msgBuf
       INTEGER fld, vec_id
       INTEGER mask_fld_index
-      INTEGER n_point, i, j, k, bi, bj
+      INTEGER n_point, i, j, k, bi, bj, nK
       INTEGER i_add, j_add
       _RL val, mask_val 
 
@@ -106,6 +106,7 @@ C-- THETA
               j = vec_point_ij(vec_id,2,n_point)
               bi = vec_point_ij(vec_id,3,n_point)
               bj = vec_point_ij(vec_id,4,n_point)
+              nK = vec_depth_level(vec_id, mask_fld_index, n_point)
 
               mask_val = relax_mask(vec_id,i,j,bi,bj)
 
@@ -119,9 +120,27 @@ C-- THETA
 !      &                                   SQUEEZE_RIGHT, myThid )
 !               endif    
 
-              DO k=1,vec_levels(mask_fld_index, vec_id)
-                  val = vec_subFields(vec_id,mask_fld_index,n_point,k)
-                  theta(i,j,k,bi,bj) = val
+!               if (debug .eq. 1) then
+!                   WRITE(msgBuf,'(A,I5,A,I5,A,F10.3)') 
+!      &               "  For point ",n_point,
+!      &               " depth_level = ", 
+!      &               nK,
+!      &               ", surface_val = ", 
+!      &               vec_subFields(vec_id,mask_fld_index,n_point,1)
+!                   CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                                   SQUEEZE_RIGHT, myThid )
+!               endif  
+
+!               DO k=1,nK
+!                   val = vec_subFields(vec_id,mask_fld_index,n_point,k)
+!                   theta(i,j,k,bi,bj) = val
+!                   if ((debug .eq. 1).and.(k.eq.nK)) then
+!                         WRITE(msgBuf,'(A,F10.3,A,I5)') 
+!      &               "  Prescribed theta = ",val,
+!      &               " at depth_level = ", k
+!                         CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                                   SQUEEZE_RIGHT, myThid )
+!                   endif 
 
 C           Fill in the halo region if the point is on the boundary
             IF (i.eq.sNx) THEN
@@ -228,6 +247,7 @@ C-- SALT
             j = vec_point_ij(vec_id,2,n_point)
             bi = vec_point_ij(vec_id,3,n_point)
             bj = vec_point_ij(vec_id,4,n_point)
+            nK = vec_depth_level(vec_id, mask_fld_index, n_point)
 
             mask_val = relax_mask(vec_id,i,j,bi,bj)
 
@@ -241,7 +261,7 @@ C-- SALT
 !      &                                   SQUEEZE_RIGHT, myThid )
 !             endif    
 
-            DO k=1,vec_levels(mask_fld_index, vec_id)
+            DO k=1,nK
                 val = vec_subFields(vec_id,mask_fld_index,n_point,k)
                 salt(i,j,k,bi,bj) = val
 
@@ -314,6 +334,7 @@ C-- UVEL
             j = vec_point_ij(vec_id,2,n_point)
             bi = vec_point_ij(vec_id,3,n_point)
             bj = vec_point_ij(vec_id,4,n_point)
+            nK = vec_depth_level(vec_id, mask_fld_index, n_point)
 
             mask_val = relax_mask(vec_id,i,j,bi,bj)
 
@@ -327,7 +348,7 @@ C-- UVEL
 !      &                                   SQUEEZE_RIGHT, myThid )
 !             endif    
 
-            DO k=1,vec_levels(mask_fld_index, vec_id)
+            DO k=1,nK
                 val = vec_subFields(vec_id,mask_fld_index,n_point,k)
                 uvel(i,j,k,bi,bj) = val
 
@@ -400,6 +421,7 @@ C-- VVEL
             j = vec_point_ij(vec_id,2,n_point)
             bi = vec_point_ij(vec_id,3,n_point)
             bj = vec_point_ij(vec_id,4,n_point)
+            nK = vec_depth_level(vec_id, mask_fld_index, n_point)
 
             mask_val = relax_mask(vec_id,i,j,bi,bj)
 
@@ -413,7 +435,7 @@ C-- VVEL
 !      &                                   SQUEEZE_RIGHT, myThid )
 !             endif    
 
-            DO k=1,vec_levels(mask_fld_index, vec_id)
+            DO k=1,nK
                 val = vec_subFields(vec_id,mask_fld_index,n_point,k)
                 vvel(i,j,k,bi,bj) = val
 
@@ -526,6 +548,7 @@ C-- The prescribe_vec pkg does not currently allow for the prescription of GU
             j = vec_point_ij(vec_id,2,n_point)
             bi = vec_point_ij(vec_id,3,n_point)
             bj = vec_point_ij(vec_id,4,n_point)
+            nK = vec_depth_level(vec_id, mask_fld_index, n_point)
 
             mask_val = relax_mask(vec_id,i,j,bi,bj)
 
@@ -539,7 +562,7 @@ C-- The prescribe_vec pkg does not currently allow for the prescription of GU
 !      &                                   SQUEEZE_RIGHT, myThid )
 !             endif    
 
-            DO k=1,vec_levels(mask_fld_index, vec_id)
+            DO k=1,nK
                 val = vec_subFields(vec_id,mask_fld_index,n_point,k)
                 gU(i,j,k,bi,bj) = val
 
@@ -612,6 +635,7 @@ C-- GV
             j = vec_point_ij(vec_id,2,n_point)
             bi = vec_point_ij(vec_id,3,n_point)
             bj = vec_point_ij(vec_id,4,n_point)
+            nK = vec_depth_level(vec_id, mask_fld_index, n_point)
 
             mask_val = relax_mask(vec_id,i,j,bi,bj)
 
@@ -625,7 +649,7 @@ C-- GV
 !      &                                   SQUEEZE_RIGHT, myThid )
 !             endif    
 
-            DO k=1,vec_levels(mask_fld_index, vec_id)
+            DO k=1,nK
                 val = vec_subFields(vec_id,mask_fld_index,n_point,k)
                 gV(i,j,k,bi,bj) = val
 

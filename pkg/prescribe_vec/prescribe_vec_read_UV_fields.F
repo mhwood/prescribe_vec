@@ -42,12 +42,25 @@ C      INTEGER i,j,k,l, bi,bj
       INTEGER mask_name_len
       CHARACTER*50 field_file_name
       INTEGER iRecord
+      LOGICAL continue_to_read
 
 CEOP
 C------------------------------------------------------------------------------|
 CBOC
 
 #ifdef ALLOW_PRESCRIBE_VEC
+
+      IF (vec_field_is_constant) THEN 
+            IF (myIter.gt.nIter0) THEN 
+                  continue_to_read = .FALSE.
+            ELSE
+                  continue_to_read = .TRUE.
+            ENDIF
+      ELSE
+            continue_to_read = .TRUE.
+      ENDIF
+
+      IF (continue_to_read) THEN
 
       if (debug .eq. 1) then
       WRITE(msgBuf,'(A)') "==========================================="
@@ -181,6 +194,8 @@ C      ENDDO
 C      ENDDO
 C      endif
 
+
+
 C------------------------------------------------------------------------------|
 
       if (debug .eq. 1) then
@@ -194,6 +209,9 @@ C------------------------------------------------------------------------------|
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                     SQUEEZE_RIGHT, myThid )
       endif
+
+C     endif (continue_to_read) 
+      ENDIF
 
       RETURN
 

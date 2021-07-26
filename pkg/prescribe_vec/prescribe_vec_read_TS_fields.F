@@ -41,12 +41,26 @@ C      INTEGER i,j,k,l, bi,bj
       INTEGER mask_name_len
       CHARACTER*50 field_file_name
       INTEGER iRecord
+      LOGICAL continue_to_read
 
 CEOP
 C------------------------------------------------------------------------------|
 CBOC
 
 #ifdef ALLOW_PRESCRIBE_VEC
+
+      
+      IF (vec_field_is_constant) THEN 
+            IF (myIter.gt.nIter0) THEN 
+                  continue_to_read = .FALSE.
+            ELSE
+                  continue_to_read = .TRUE.
+            ENDIF
+      ELSE
+            continue_to_read = .TRUE.
+      ENDIF
+
+      IF (continue_to_read) THEN
 
       if (debug .eq. 1) then
       WRITE(msgBuf,'(A)') "==========================================="
@@ -156,29 +170,29 @@ C------------------------------------------------------------------------------|
 C     Sanity check the output by checking all surface values for one 
 C     variable on one mask 
 
-      if (debug .eq. 1) then
-      WRITE(msgBuf,'(A)') "==========================================="
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
-      WRITE(msgBuf,'(A)') "  Checking surface values for the first "
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
-      WRITE(msgBuf,'(A)') "  variable in each mask: "
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
+!       if (debug .eq. 1) then
+!       WRITE(msgBuf,'(A)') "==========================================="
+!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                     SQUEEZE_RIGHT, myThid )
+!       WRITE(msgBuf,'(A)') "  Checking surface values for the first "
+!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                     SQUEEZE_RIGHT, myThid )
+!       WRITE(msgBuf,'(A)') "  variable in each mask: "
+!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                     SQUEEZE_RIGHT, myThid )
 
-      DO vec_id=1,nVEC_masks
-      WRITE(msgBuf,'(A,I2,A)') "  Values for mask ",vec_id,":"
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
-      DO n=1,vec_numPnts_allproc(vec_id, mpiMyId+1)
-      WRITE(msgBuf,'(A,I5,A,F10.5)') "   Point",n,' = ',
-     &      vec_subFields(vec_id,1,n,1)
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
-      ENDDO
-      ENDDO
-      endif
+!       DO vec_id=1,nVEC_masks
+!       WRITE(msgBuf,'(A,I2,A)') "  Values for mask ",vec_id,":"
+!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                     SQUEEZE_RIGHT, myThid )
+!       DO n=1,vec_numPnts_allproc(vec_id, mpiMyId+1)
+!       WRITE(msgBuf,'(A,I5,A,F10.5)') "   Point",n,' = ',
+!      &      vec_subFields(vec_id,1,n,1)
+!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                     SQUEEZE_RIGHT, myThid )
+!       ENDDO
+!       ENDDO
+!       endif
 
 C------------------------------------------------------------------------------|
 
@@ -193,6 +207,10 @@ C------------------------------------------------------------------------------|
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                     SQUEEZE_RIGHT, myThid )
       endif
+
+C     endif (continue_to_read) 
+      ENDIF
+
 
       RETURN
 

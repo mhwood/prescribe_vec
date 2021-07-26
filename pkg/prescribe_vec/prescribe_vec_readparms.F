@@ -44,10 +44,11 @@ C----&------------------------------------------------------------------xxxxxxx|
 CBOC
 
 C----&------------------------------------------------------------------xxxxxxx|
-C     Define the prescribe_vec variables (used in prescribe_vec)
+C     Define the prescribe_vec variables (used in data.prescribe_vec)
 C----&------------------------------------------------------------------xxxxxxx|
       
       CHARACTER*30 nml_fname_prefixes(nVEC_masks)
+      CHARACTER*30 nml_depth_cell_fnames(N_VEC_FIELDS,nVEC_masks)
       CHARACTER*30 nml_relax_time_fnames(nVEC_masks)
       CHARACTER*30 nml_relax_mask_fnames(nVEC_masks)
       CHARACTER*8 nml_fields(N_VEC_FIELDS, nVEC_masks)
@@ -55,15 +56,18 @@ C----&------------------------------------------------------------------xxxxxxx|
       INTEGER nml_filePrec
       INTEGER nml_nTimesteps
       LOGICAL nml_fields_include_ICs
+      LOGICAL nml_field_is_constant
 
       NAMELIST / PRESCRIBE_VEC_PARM01 /
      &     nml_fname_prefixes,
+     &     nml_depth_cell_fnames,
      &     nml_relax_time_fnames, nml_relax_mask_fnames,
      &     nml_fields,
      &     nml_levels,
      &     nml_filePrec,
      &     nml_nTimesteps,
-     &     nml_fields_include_ICs
+     &     nml_fields_include_ICs,
+     &     nml_field_is_constant
 
 
       if (debug .eq. 1) then
@@ -102,7 +106,8 @@ C --   Local default flags and values for PRESCRIBE_VEC
       DO n=1,N_VEC_FIELDS
             DO m=1,nVEC_masks
                   nml_fields(n,m) = ' '
-                  nml_levels(n, m) = 0
+                  nml_depth_cell_fnames(n,m) = ' '
+                  nml_levels(n, m) = 1
             ENDDO
       ENDDO
 
@@ -115,6 +120,7 @@ C --   Local default flags and values for PRESCRIBE_VEC
       nml_filePrec  = 64
       nml_nTimesteps = 0
       nml_fields_include_ICs = .FALSE.
+      nml_field_is_constant = .FALSE.
 
 
 C----&------------------------------------------------------------------xxxxxxx|
@@ -153,6 +159,8 @@ C----&------------------------------------------------------------------xxxxxxx|
       DO n=1,N_VEC_FIELDS
             DO m=1,nVEC_masks
               vec_flds(n, m) = nml_fields(n, m)
+              vec_depth_cell_fnames(n, m) = 
+     &             nml_depth_cell_fnames(n, m)
               if (nml_fields(n,m) .ne. ' ') then
                 vec_nFlds(m) = vec_nFlds(m) + 1
               endif
@@ -170,6 +178,7 @@ C              print *, 'vec_levels(',n,',',m,')',vec_levels(n, m)
       vec_filePrec  = nml_filePrec
       nTimesteps_vec = nml_nTimesteps
       vec_fields_include_ICs = nml_fields_include_ICs
+      vec_field_is_constant = nml_field_is_constant
 
 C----&------------------------------------------------------------------xxxxxxx|
 C     Fill PRESCRIBE_VEC.h COMMON Block with some default namelist 
