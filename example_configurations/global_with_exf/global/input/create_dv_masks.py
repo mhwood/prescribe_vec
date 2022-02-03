@@ -5,9 +5,9 @@ import numpy as np
 
 domain_shape = (40,90)
 min_row = 10
-max_row = 30
+max_row = 29
 min_col= 25
-max_col = 65
+max_col = 64
 
 layers = 3
 
@@ -15,8 +15,8 @@ if 'dv' not in os.listdir(os.getcwd()):
     os.mkdir(os.path.join(os.getcwd(),'dv'))
 
 # create the eastern masks
-mask = np.zeros(domain_shape)
 for layer in range(layers):
+    mask = np.zeros(domain_shape)
     counter = 1
     for row in range(min_row,max_row+1):
         mask[row,max_col-layer] = counter
@@ -28,8 +28,8 @@ for layer in range(layers):
     mask.ravel(order='C').astype('>f4').tofile(file_name)
 
 # create the western masks
-mask = np.zeros(domain_shape)
 for layer in range(layers):
+    mask = np.zeros(domain_shape)
     counter = 1
     for row in range(min_row,max_row+1):
         mask[row,min_col+layer] = counter
@@ -41,8 +41,8 @@ for layer in range(layers):
     mask.ravel(order='C').astype('>f4').tofile(file_name)
 
 # create the southern masks
-mask = np.zeros(domain_shape)
 for layer in range(layers):
+    mask = np.zeros(domain_shape)
     counter = 1
     for col in range(min_col,max_col+1):
         mask[min_row+layer,col] = counter
@@ -54,8 +54,8 @@ for layer in range(layers):
     mask.ravel(order='C').astype('>f4').tofile(file_name)
 
 # create the northern masks
-mask = np.zeros(domain_shape)
 for layer in range(layers):
+    mask = np.zeros(domain_shape)
     counter = 1
     for col in range(min_col,max_col+1):
         mask[max_row-layer,col] = counter

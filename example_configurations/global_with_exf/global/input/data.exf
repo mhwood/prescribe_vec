@@ -8,36 +8,24 @@
 
 # *********************
  &EXF_NML_02
-#hfluxstartdate1   = 19920101,
-#hfluxstartdate2   = 000000,
  hfluxperiod       = -12.,
 #
-#sfluxstartdate1   = 19920101,
-#sfluxstartdate2   = 000000,
  sfluxperiod       = -12.,
 #
-#ustressstartdate1 = 19920101,
-#ustressstartdate2 = 000000,
  ustressperiod     = -12.,
 #
-#vstressstartdate1 = 19920101,
-#vstressstartdate2 = 000000,
  vstressperiod     = -12.,
 #
- climsststartdate1 = 19911216,
- climsststartdate2 = 000000,
- climsstperiod     = -1.,
+ climsstperiod     = -12.,
 # 2 months restoring timescale for temperature
  climsstTauRelax   = 5184000.,
 #
-#climsssstartdate1 = 19920101,
-#climsssstartdate2 = 000000,
  climsssperiod     = -12.,
 # 6 months restoring timescale for salinity
  climsssTauRelax   = 15552000.,
 #
  hfluxfile    = 'ncep_qnet.bin',
-#sfluxfile    = 'ncep_emp.bin',
+ sfluxfile    = 'ncep_emp.bin',
  ustressfile  = 'trenberth_taux.bin',
  vstressfile  = 'trenberth_tauy.bin',
  climsstfile  = 'lev_sst.bin',
