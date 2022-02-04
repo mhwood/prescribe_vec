@@ -10,11 +10,11 @@ CBOP
 C !ROUTINE: PRESCRIBE_VEC_READ_FIELDS
 
 C !INTERFACE:
-      SUBROUTINE PRESCRIBE_VEC_READ_TS_FIELDS(myTime, 
-     &                                       myIter, myThid)
+      SUBROUTINE PRESCRIBE_VEC_READ_FIELDS(myTime, 
+     &                                       myIter, myThid )
 
 C     !DESCRIPTION:
-C     Initialize PRESCRIBE_VEC THETA and SALT variables
+C     Initialize PRESCRIBE_VEC variables
 
 C     !USES:
       IMPLICIT NONE
@@ -49,9 +49,22 @@ CBOC
 
 #ifdef ALLOW_PRESCRIBE_VEC
 
-      
-      IF (vec_field_is_constant) THEN 
-            IF (myIter.gt.nIter0) THEN 
+      if (debug .eq. 1) then
+      WRITE(msgBuf,'(A)') "==========================================="
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      WRITE(msgBuf,'(A)') "  BEGIN PRESCRIBE_VEC_READ_FIELDS DEBUG "
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      WRITE(msgBuf,'(A)') "==========================================="
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      endif
+
+C------------------------------------------------------------------------------|
+
+       IF (vec_field_is_constant) THEN 
+            IF (myIter.ge.nIter0) THEN 
                   continue_to_read = .FALSE.
             ELSE
                   continue_to_read = .TRUE.
@@ -61,20 +74,6 @@ CBOC
       ENDIF
 
       IF (continue_to_read) THEN
-
-      if (debug .eq. 1) then
-      WRITE(msgBuf,'(A)') "==========================================="
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
-      WRITE(msgBuf,'(A)') "  BEGIN PRESCRIBE_VEC_READ_TS_FIELDS DEBUG "
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
-      WRITE(msgBuf,'(A)') "==========================================="
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT, myThid )
-      endif
-
-C------------------------------------------------------------------------------|
 
 C     In this code, we 
 C        1 - loop through all of the masks and read in the the variables 
@@ -105,61 +104,36 @@ C           around the mask name
 C           Loop through each field name to read in the file
             DO f=1,vec_nFlds(vec_id)
 
-C           Counting number of valid characters to trim trailing 
-C           whitespaces around the field name
-            fld_name_len = 0
-            DO i=1, len(vec_flds(f, vec_id))
-                  IF (vec_flds(f, vec_id)(i:i) .ne. ' ') THEN
+C                 Counting number of valid characters to trim trailing 
+C                 whitespaces around the field name
+                  fld_name_len = 0
+                  DO i=1, len(vec_flds(f, vec_id))
+                    IF (vec_flds(f, vec_id)(i:i) .ne. ' ') then
                         fld_name_len = fld_name_len + 1
-                  ENDIF
-            ENDDO
-            WRITE(field_file_name, "(A,A,A,A)") 
-     &          vec_fname_prefixes(vec_id)(1:mask_name_len),"_",
-     &          vec_flds(f, vec_id)(1:fld_name_len),".bin"
+                    ENDIF
+                  ENDDO
+                  WRITE(field_file_name, "(A,A,A,A)") 
+     &               vec_fname_prefixes(vec_id)(1:mask_name_len),"_",
+     &               vec_flds(f, vec_id)(1:fld_name_len),".bin"
+
+C                 Find an addition factor for where to read the fields in the file provided
+C                 In forward_step.F, myIter is incremented after dynamics, i.e.
+C                 we need to substract 1 if reading in uvel, vvel 
 
 C                 Next, read in the fields     
 C                 For now, the record number to read is just assigned to how many steps
 C                 have occured since the start of the simulation
 C                 If the first field is the initial condition, then ignore it
-            IF (vec_fields_include_ICs) THEN
-                  iRecord = myIter - nIter0 + 2
-            ELSE
-                  iRecord = myIter - nIter0 + 1
-            ENDIF
-
-C           only read the field if its theta...
-            IF (fld_name_len.eq.5) THEN
-            if (vec_flds(f, vec_id)(1:fld_name_len).eq.'THETA') then
-
-            WRITE(msgBuf,'(A,A,I5,A,I5)') " Reading in the THETA ",
-     &            "field on mask ", vec_id," at myIter = ",myIter
-            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                          SQUEEZE_RIGHT, myThid )
+                  IF (vec_fields_include_ICs) THEN
+                        iRecord = myIter - nIter0 + 2
+                  ELSE
+                        iRecord = myIter - nIter0 + 1
+                  ENDIF
 
                   CALL READ_VEC_FIELD(field_file_name, vec_id, f,
      I                 vec_numPnts_allproc(vec_id, mpiMyId+1),
      I                 vec_levels(f, vec_id),
      I                 iRecord, myThid)
-
-            endif
-            ENDIF
-
-C           ...or if its salt
-            IF (fld_name_len.eq.4) THEN
-            if (vec_flds(f, vec_id)(1:fld_name_len).eq.'SALT') then
-
-            WRITE(msgBuf,'(A,A,I5,A,I5)') " Reading in the SALT ",
-     &         "field on mask ", vec_id," at myIter = ",myIter
-            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                          SQUEEZE_RIGHT, myThid )
-
-                  CALL READ_VEC_FIELD(field_file_name, vec_id, f,
-     I                 vec_numPnts_allproc(vec_id, mpiMyId+1),
-     I                 vec_levels(f, vec_id),
-     I                 iRecord, myThid)
-
-            endif
-            ENDIF
 
             ENDDO     
 
@@ -170,29 +144,32 @@ C------------------------------------------------------------------------------|
 C     Sanity check the output by checking all surface values for one 
 C     variable on one mask 
 
-!       if (debug .eq. 1) then
-!       WRITE(msgBuf,'(A)') "==========================================="
-!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-!      &                     SQUEEZE_RIGHT, myThid )
-!       WRITE(msgBuf,'(A)') "  Checking surface values for the first "
-!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-!      &                     SQUEEZE_RIGHT, myThid )
-!       WRITE(msgBuf,'(A)') "  variable in each mask: "
-!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-!      &                     SQUEEZE_RIGHT, myThid )
+      if (debug .eq. 1) then
+      WRITE(msgBuf,'(A)') "==========================================="
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      WRITE(msgBuf,'(A)') "  Checking surface values for the first "
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      WRITE(msgBuf,'(A)') "  variable in each mask: "
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
 
-!       DO vec_id=1,nVEC_masks
-!       WRITE(msgBuf,'(A,I2,A)') "  Values for mask ",vec_id,":"
-!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-!      &                     SQUEEZE_RIGHT, myThid )
-!       DO n=1,vec_numPnts_allproc(vec_id, mpiMyId+1)
-!       WRITE(msgBuf,'(A,I5,A,F10.5)') "   Point",n,' = ',
-!      &      vec_subFields(vec_id,1,n,1)
-!       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-!      &                     SQUEEZE_RIGHT, myThid )
-!       ENDDO
-!       ENDDO
-!       endif
+      DO vec_id=1,nVEC_masks
+      WRITE(msgBuf,'(A,I2,A)') "  Values for mask ",vec_id,":"
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      DO n=1,vec_numPnts_allproc(vec_id, mpiMyId+1)
+      WRITE(msgBuf,'(A,I5,A,F10.5)') "   Point",n,' = ',
+     &      vec_subFields(vec_id,1,n,1)
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT, myThid )
+      ENDDO
+      ENDDO
+      endif
+
+C     endif (continue_to_read) 
+      ENDIF
 
 C------------------------------------------------------------------------------|
 
@@ -200,7 +177,7 @@ C------------------------------------------------------------------------------|
       WRITE(msgBuf,'(A)') "==========================================="
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                     SQUEEZE_RIGHT, myThid )
-      WRITE(msgBuf,'(A)') "  END PRESCRIBE_VEC_READ_TS_FIELDS DEBUG "
+      WRITE(msgBuf,'(A)') "  END PRESCRIBE_VEC_READ_FIELDS DEBUG "
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                     SQUEEZE_RIGHT, myThid )
       WRITE(msgBuf,'(A)') "==========================================="
@@ -208,11 +185,9 @@ C------------------------------------------------------------------------------|
      &                     SQUEEZE_RIGHT, myThid )
       endif
 
-C     endif (continue_to_read) 
-      ENDIF
-
-
       RETURN
+
+
 
 #endif /* ALLOW_PRESCRIBE_VEC */
       
@@ -220,6 +195,7 @@ C     endif (continue_to_read)
 CEOC
 C----&------------------------------------------------------------------xxxxxxx|
 C----&------------------------------------------------------------------xxxxxxx|
+
 
 
 

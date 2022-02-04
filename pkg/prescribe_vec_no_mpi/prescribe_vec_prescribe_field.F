@@ -112,24 +112,24 @@ C-- THETA
 
               IF (mask_val.eq.0) THEN
 
-              if (debug .eq. 1) then
-                  WRITE(msgBuf,'(A,I5,A,F10.3,A)') 
-     &               "  For point ",n_point,
-     &                " relax_mask = ", mask_val," ==> prescribe point"
-                  CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                                   SQUEEZE_RIGHT, myThid )
-              endif    
+!               if (debug .eq. 1) then
+!                   WRITE(msgBuf,'(A,I5,A,F10.3,A)') 
+!      &               "  For point ",n_point,
+!      &                " relax_mask = ", mask_val," ==> prescribe point"
+!                   CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                                   SQUEEZE_RIGHT, myThid )
+!               endif    
 
-              if (debug .eq. 1) then
-                  WRITE(msgBuf,'(A,I5,A,I5,A,F10.3)') 
-     &               "  For point ",n_point,
-     &               " depth_level = ", 
-     &               nK,
-     &               ", surface_val = ", 
-     &               vec_subFields(vec_id,mask_fld_index,n_point,1)
-                  CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                                   SQUEEZE_RIGHT, myThid )
-              endif  
+!               if (debug .eq. 1) then
+!                   WRITE(msgBuf,'(A,I5,A,I5,A,F10.3)') 
+!      &               "  For point ",n_point,
+!      &               " depth_level = ", 
+!      &               nK,
+!      &               ", surface_val = ", 
+!      &               vec_subFields(vec_id,mask_fld_index,n_point,1)
+!                   CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+!      &                                   SQUEEZE_RIGHT, myThid )
+!               endif  
 
                DO k=1,nK
                    val = vec_subFields(vec_id,mask_fld_index,n_point,k)

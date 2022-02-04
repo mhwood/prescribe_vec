@@ -1,0 +1,21 @@
+C CPP options file for PRESCRIBE_VEC package
+C Use this file for selecting options within the PRESCRIBE_VEC package
+
+#ifndef PRESCRIBE_VEC_OPTIONS_H
+#define PRESCRIBE_VEC_OPTIONS_H
+
+#include "PACKAGES_CONFIG.h"
+#include "CPP_OPTIONS.h"
+
+#ifdef ALLOW_PRESCRIBE_VEC
+
+#define ALLOW_PRESCRIBE_VEC_THETA
+#define ALLOW_PRESCRIBE_VEC_SALT
+#define ALLOW_PRESCRIBE_VEC_UVEL
+#define ALLOW_PRESCRIBE_VEC_VVEL
+#undef ALLOW_PRESCRIBE_VEC_WVEL
+#define ALLOW_PRESCRIBE_VEC_ETA
+
+#endif /* ALLOW_PRESCRIBE_VEC */
+
+#endif /* PRESCRIBE_VEC_OPTIONS_H */

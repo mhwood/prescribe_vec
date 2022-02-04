@@ -83,23 +83,23 @@ C         -> vec_mask_index_list needs refs to tiles, which is not yet implement
      &                     SQUEEZE_RIGHT , 1)
       ENDIF
 
-C      IF (nPx.GT.1) THEN
-C            errCount = errCount +1
-C            WRITE(msgBuf,'(A)')
-C     &    'prescribe_vec has not been tested with nPx > 1 or nPy > 1'
-C            CALL PRINT_ERROR( msgBuf, myThid )
-C            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-C     &                     SQUEEZE_RIGHT , 1)
-C      ENDIF
+      IF (nPx.GT.1) THEN
+            errCount = errCount +1
+            WRITE(msgBuf,'(A)')
+     &    'prescribe_vec has not been tested with nPx > 1 or nPy > 1'
+            CALL PRINT_ERROR( msgBuf, myThid )
+            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT , 1)
+      ENDIF
 
-C      IF (nPy.GT.1) THEN
-C            errCount = errCount +1
-C            WRITE(msgBuf,'(A)')
-C     &    'prescribe_vec has not been tested with nPx > 1 or nPy > 1'
-C            CALL PRINT_ERROR( msgBuf, myThid )
-C            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-C     &                     SQUEEZE_RIGHT , 1)
-C      ENDIF
+      IF (nPy.GT.1) THEN
+            errCount = errCount +1
+            WRITE(msgBuf,'(A)')
+     &    'prescribe_vec has not been tested with nPx > 1 or nPy > 1'
+            CALL PRINT_ERROR( msgBuf, myThid )
+            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                     SQUEEZE_RIGHT , 1)
+      ENDIF
 
 C ---  Fourth check: if ALLOW_PRESCRIBE_VEC_THETA (e.g.)
 C      make sure "THETA" is in the list of variables

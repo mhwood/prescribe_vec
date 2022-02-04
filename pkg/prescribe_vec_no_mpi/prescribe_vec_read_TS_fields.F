@@ -11,7 +11,7 @@ C !ROUTINE: PRESCRIBE_VEC_READ_FIELDS
 
 C !INTERFACE:
       SUBROUTINE PRESCRIBE_VEC_READ_TS_FIELDS(myTime, 
-     &                                       myIter, myThid)
+     &                                       myIter, myThid )
 
 C     !DESCRIPTION:
 C     Initialize PRESCRIBE_VEC THETA and SALT variables
