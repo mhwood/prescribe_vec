@@ -9,7 +9,7 @@ C     Define the global prescribe_vec variables
 C------------------------------------------------------------------------------|
 
       INTEGER, PARAMETER :: nVEC_masks = 4
-      INTEGER, PARAMETER :: N_VEC_FIELDS = 5
+      INTEGER, PARAMETER :: N_VEC_FIELDS = 5 
 
 C     These are the name of the fields to be prescribed
       CHARACTER*8 vec_flds(N_VEC_FIELDS, nVEC_masks)

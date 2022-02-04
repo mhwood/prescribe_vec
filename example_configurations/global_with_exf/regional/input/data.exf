@@ -1,0 +1,46 @@
+# *********************
+# External Forcing Data
+# *********************
+ &EXF_NML_01
+ exf_iprec         = 32,
+ exf_debugLev      = 3,
+ &
+
+# *********************
+ &EXF_NML_02
+ hfluxperiod       = 1200.,
+#
+ sfluxperiod       = 1200.,
+#
+ ustressperiod     = 1200.,
+#
+ vstressperiod     = 1200.,
+#
+ climsstperiod     = -12.,
+# 2 months restoring timescale for temperature
+ climsstTauRelax   = 5184000.,
+#
+ climsssperiod     = -12.,
+# 6 months restoring timescale for salinity
+ climsssTauRelax   = 15552000.,
+#
+ climsstfile  = 'lev_sst.bin',
+ climsssfile  = 'lev_sss.bin',
+#
+ &
+
+# *********************
+ &EXF_NML_03
+ &
+
+# *********************
+ &EXF_NML_04
+ hflux_interpMethod = 0,
+ sflux_interpMethod = 0,
+ ustress_interpMethod = 0,
+ vstress_interpMethod = 0,
+#
+ &
+
+ &EXF_NML_OBCS
+ &

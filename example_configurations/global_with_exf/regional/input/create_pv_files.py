@@ -75,11 +75,11 @@ for boundary_name in boundary_names:
                 counter += 1
         if boundary_name == 'east':
             for n in range(N):
-                prescribe_vec_mask[n, -layer] = counter
+                prescribe_vec_mask[n, -layer-1] = counter
                 counter += 1
         if boundary_name == 'north':
             for n in range(N):
-                prescribe_vec_mask[-layer, n] = counter
+                prescribe_vec_mask[-layer-1, n] = counter
                 counter += 1
     print('    - The mask has shape '+str(np.shape(prescribe_vec_mask))+' with '+str(np.sum(prescribe_vec_mask!=0))+' points')
     file_name = os.path.join(os.getcwd(), 'bcs', 'BC_' + boundary_name + '.bin')

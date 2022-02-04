@@ -1,0 +1,17 @@
+# Open-boundaries
+ &OBCS_PARM01
+#
+ OBCSfixTopo=.FALSE.,
+#
+ OB_Jnorth= 40*-1,
+ OB_Jsouth= 40*1,
+ OB_Ieast = 20*-1,
+ OB_Iwest = 20*1,
+#
+ useOBCSprescribe = .TRUE.,
+#
+ &
+
+
+ &OBCS_PARM02
+ &
