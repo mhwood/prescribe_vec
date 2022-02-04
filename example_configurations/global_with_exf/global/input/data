@@ -20,7 +20,7 @@
  implicitDiffusion=.TRUE.,
  allowFreezing=.TRUE.,
  useRealFreshWaterFlux=.TRUE.,
- useCDscheme=.TRUE.,
+# useCDscheme=.TRUE.,
  useNHMTerms=.TRUE.,
 # turn on looped cells
  hFacMin=.05,
@@ -48,7 +48,7 @@
 # startTime  =          0.,
 # endTime    = 3110400000.,
  deltaTmom = 1200.0,
- tauCD =     321428.,
+# tauCD =     321428.,
  deltaTtracer= 1200.0,
  deltaTClock = 1200.0,
 # if you are using a version later than checkpoint45d on the main branch
