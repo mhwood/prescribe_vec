@@ -2,6 +2,8 @@
 
 Author: Michael Wood
 
+:raised_hand: Note: this package is under construction and requires several updates before it is full operational. 
+
 ## Package Purpose and Motivation
 Here, we design a flexible model package which is capable of prescribing model variables in any subset of the model domain e.g. along a vector (or "vec"). 
 
