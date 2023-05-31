@@ -12,7 +12,14 @@ The purpose of this repository is to provide a convenient way to merge new packa
 ```
 python3 copy_pkg_files_to_MITgcm.py -m /path/to/MITgcm_fresh
 ```
-This code will add the ```prescribe_vec``` package files into the pkg directory. In addition, there are a number of ```src``` scripts which must be edited to include the package. For a particular configuration, these edits can be carried out using the following script:
+This code will add the ```prescribe_vec``` package files into the pkg directory. 
+
+## Implementing ```prescribe_vec``` in a configuration
+To add prescribe_vec to your configuration, there are a number of ```src``` scripts which must be edited to include the package. It's recommended that your configurations are stored in the following path:
+```
+MITgcm/configuration/your_config
+```
+Then, for a particular configuration, these edits can be carried out using the following script:
 ```
 python3 edit_src_files_for_config.py -m /path/to/MITgcm_fresh -c /path/to/model/config
 ```
