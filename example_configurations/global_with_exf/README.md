@@ -73,3 +73,51 @@ ln -s ../input/* .
 mpirun -np 2 ../build/mitgcmuv
 cd ..
 ```
+
+## The Regional Model
+Next, the output from the global model will be used to prescribe the external forcing and boundary conditions for the regional model. First, we will create the regional model fields in the following steps:
+
+1. Subset bathymetry and hydography fields from the global to regional domain; create exf conditions
+2. Create boundary conditions from the global model output to be applied with the prescribe_vec package
+3. Copy unchanged files from the core tutorial
+There are three convenient scripts in the regional/input directory which carry out the steps above:
+```
+cd ../regional/input
+python3 subset_regional_fields.py
+python3 create_pv_files.py
+bash prepare_run
+```
+If you would like to view the locations of the `prescribe_vec` masks used for boundary conditions, use the regional_config notebook provided in the notebooks directory.
+
+Before buliding the model, we will add the `prescribe_vec` package to the boot sequence and the main loop using the following scripts:
+```
+cd ../../../../../prescribe_vec/utils
+python3 add_prescribe_vec_to_boot_sequence.py -m ../../MITgcm -c ../../MITgcm/configurations/global_with_exf/regional
+python3 add_prescribe_vec_to_main_loop.py -m ../../MITgcm -c ../../MITgcm/configurations/global_with_exf/regional
+cd ../../MITgcm/configurations/global_with_exf/regional
+```
+Note that the code directory now has new files for the book sequence and the main loop.
+
+Now, build the model as was done for the regional model:
+```
+mkdir build
+cd build
+../../../../../MITgcm/tools/genmake2 -mods ../code -mpi -optfile ../../../../../MITgcm/tools/build_options/darwin_amd64_gfortran -rootdir ../../../../../MITgcm
+make depend
+make
+cd ..
+```
+
+Finally, run the regional model:
+```
+mkdir run
+cd run
+mkdir diags
+mkdir diags/diagsDyn
+ln -s ../input/* .
+ln -s ../input/bcs/*.bin .
+mpirun -np 4 ../build/mitgcmuv
+cd ..
+```
+
+To compare the output of the regional model with the output of the global model, us the global_vs_regional notebook. 
