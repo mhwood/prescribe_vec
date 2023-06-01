@@ -43,8 +43,13 @@ To create the setup, first run the `prepare_run` script to collect all of the co
 ```
 cd global/input
 bash prepare_run
+python3 create_dv_masks.py
 cd ..
 ```
+If you would like to view the locations of the `diagnostics_vec` masks used for boundary output, use the global_config notebook provided in the notebooks directory.
+
+:exclamation: Note: If you use a `conda` environment, be sure to deactivate it in your terminal before building and running the model.
+
 Next, build the model according to the specifications on your machine. For example:
 ```
 mkdir build
